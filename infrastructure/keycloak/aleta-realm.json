@@ -1,0 +1,281 @@
+{
+  "id": "aleta",
+  "realm": "aleta",
+  "displayName": "ALETA AI Learning Ecosystem",
+  "displayNameHtml": "<strong>ALETA AI Learning Ecosystem</strong>",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "registrationEmailAsUsername": false,
+  "rememberMe": true,
+  "verifyEmail": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "maxFailureAttempts": 5,
+  "minimumQuickLoginWaitSeconds": 60,
+  "waitIncrementSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "maxDeltaTimeSeconds": 86400,
+  "failureFactor": 5,
+  "maxFailureAttemptsWithoutLockout": 0,
+  "lockoutDecrementSeconds": 900,
+  "accessTokenLifespan": 900,
+  "accessTokenLifespanForImplicitFlow": 900,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "ssoSessionIdleTimeoutRememberMe": 1800,
+  "ssoSessionMaxLifespanRememberMe": 36000,
+  "offlineSessionIdleTimeout": 2592000,
+  "offlineSessionMaxLifespan": 5184000,
+  "roles": {
+    "realm": [
+      {
+        "id": "role_superadmin",
+        "name": "SUPERADMIN",
+        "description": "Super Administrator with full multi-tenant system access (MFA Mandatory)",
+        "composite": false,
+        "clientRole": false,
+        "attributes": {
+          "mfa_required": [
+            "true"
+          ]
+        }
+      },
+      {
+        "id": "role_admin_yayasan",
+        "name": "ADMIN_YAYASAN",
+        "description": "Yayasan Administrator managing schools, curricula, and transition states (MFA Mandatory)",
+        "composite": false,
+        "clientRole": false,
+        "attributes": {
+          "mfa_required": [
+            "true"
+          ]
+        }
+      },
+      {
+        "id": "role_guru",
+        "name": "GURU",
+        "description": "Teacher accessing class dashboards, differentiation tools, and modul ajar (MFA Mandatory)",
+        "composite": false,
+        "clientRole": false,
+        "attributes": {
+          "mfa_required": [
+            "true"
+          ]
+        }
+      },
+      {
+        "id": "role_siswa",
+        "name": "SISWA",
+        "description": "Student accessing adaptive learning content and personal cognitive passports",
+        "composite": false,
+        "clientRole": false,
+        "attributes": {
+          "mfa_required": [
+            "false"
+          ]
+        }
+      },
+      {
+        "id": "role_orang_tua",
+        "name": "ORANG_TUA",
+        "description": "Parent monitoring child progress insights and managing home activity consents",
+        "composite": false,
+        "clientRole": false,
+        "attributes": {
+          "mfa_required": [
+            "false"
+          ]
+        }
+      }
+    ]
+  },
+  "defaultDefaultClientScopes": [
+    "role_list",
+    "profile",
+    "email",
+    "roles",
+    "web-origins"
+  ],
+  "defaultOptionalClientScopes": [
+    "offline_access",
+    "microprofile-jwt"
+  ],
+  "clientScopes": [
+    {
+      "name": "aleta-claims",
+      "description": "Custom claims mapping tenant details, schema scopes, and learning phases to access token",
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "name": "tenant_id mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-user-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "tenant_id",
+            "claim.name": "tenant_id",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "schema_scope mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-user-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "schema_scope",
+            "claim.name": "schema_scope",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "fase_aktif mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-user-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "fase_aktif",
+            "claim.name": "fase_aktif",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "role active mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-user-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "role",
+            "claim.name": "role",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "aleta-api",
+      "name": "ALETA Backend Core API Client",
+      "description": "Secure client for server-to-server validation and token exchange using RS256",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "aleta-api-secret-placeholder-for-dev",
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "defaultClientScopes": [
+        "web-origins",
+        "role_list",
+        "roles",
+        "profile",
+        "email",
+        "aleta-claims"
+      ]
+    },
+    {
+      "clientId": "aleta-flutter",
+      "name": "ALETA Flutter Mobile App Client",
+      "description": "Public client for Flutter student and parent applications using PKCE",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": [
+        "aleta://auth",
+        "http://localhost:*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "protocol": "openid-connect",
+      "defaultClientScopes": [
+        "web-origins",
+        "roles",
+        "profile",
+        "email",
+        "aleta-claims"
+      ]
+    },
+    {
+      "clientId": "aleta-teacher-web",
+      "name": "ALETA Teacher Web Dashboard Client",
+      "description": "Public client for React teacher dashboard application using standard code flow + PKCE",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": [
+        "https://guru.aleta.localhost/*",
+        "http://localhost:*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "protocol": "openid-connect",
+      "defaultClientScopes": [
+        "web-origins",
+        "roles",
+        "profile",
+        "email",
+        "aleta-claims"
+      ]
+    },
+    {
+      "clientId": "aleta-admin-web",
+      "name": "ALETA Admin Web Dashboard Client",
+      "description": "Public client for React yayasan admin dashboard application using standard code flow + PKCE",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": [
+        "https://admin.aleta.localhost/*",
+        "http://localhost:*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "protocol": "openid-connect",
+      "defaultClientScopes": [
+        "web-origins",
+        "roles",
+        "profile",
+        "email",
+        "aleta-claims"
+      ]
+    }
+  ]
+}

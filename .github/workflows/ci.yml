@@ -1,0 +1,44 @@
+name: ALETA CI Baseline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js v20
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
+        continue-on-error: true
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+        continue-on-error: true
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+        continue-on-error: true
+
+      - name: Lint Verification Stub
+        run: |
+          echo "=== CI LINT STUB ==="
+          echo "CI will execute 'make lint' once code is committed in later phases."
+          # make lint
+
+      - name: Unit Test Verification Stub
+        run: |
+          echo "=== CI TEST STUB ==="
+          echo "CI will execute 'make test' once dependencies are populated."
+          # make test

@@ -1,0 +1,35 @@
+# ============================================================================
+# PROJECT ALETA — Git Codeowners File
+# ============================================================================
+# Menetapkan kepemilikan berkas (code ownership) untuk proses PR Review
+# berdasarkan tabel pembagian peran di Doc 15 §13.
+# ============================================================================
+
+# Blueprint & Root spesifikasi teknis
+/*.md @team-architect @team-doc-keeper
+/STATE.yaml @team-architect @team-doc-keeper
+/Makefile @team-architect @team-devops
+
+# Github Workflows & DevOps Infra
+/.github/workflows/ @team-devops
+/infrastructure/ @team-devops
+/scripts/ @team-devops
+
+# Database schemas & migrations (DBA)
+/backend_core/alembic/ @team-dba
+/backend_core/neo4j_migrations/ @team-dba
+
+# Core API Backend
+/backend_core/ @team-backend
+
+# AI & Adaptive Engine (BKT, RAG, Tutor)
+/ai_engine/ @team-ai
+
+# Frontend Flutter Mobile (Student & Parent)
+/frontend_flutter/ @team-flutter
+
+# Dashboard Web (Guru & Admin SPA)
+/teacher_dashboard_web/ @team-web
+/admin_dashboard_web/ @team-web
+/packages/ @team-web
+/infrastructure/design_tokens/ @team-web

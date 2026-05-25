@@ -1,0 +1,52 @@
+# Secrets & local config
+.env
+.env.local
+.env.*
+infrastructure/nginx/certs/*
+!infrastructure/nginx/certs/.gitkeep
+infrastructure/design_tokens/figma_links.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage*
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+dist/
+.next/
+.vite/
+.turbo/
+pnpm-debug.log
+
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+ios/Pods/
+*.iml
+.pub-cache/
+
+# Docker volumes (jika developer mount lokal)
+data/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp

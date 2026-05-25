@@ -1,269 +1,1062 @@
-# ============================================================================
-# ALETA — Canonical State File
-# ============================================================================
-# Spec: 17_MASTER_PROMPT_AND_STATE.md
-# Master prompt: MASTER_PROMPT.md
-# Update procedure: Agents emit state_patches in output; runner applies via
-#                   `make apply_patches`. Never edit this file by hand outside
-#                   of initial bootstrap or ADR-driven schema migration.
-# ============================================================================
-
 version: 1
 project: ALETA
-current_phase: 0
-last_updated: "2026-05-23T20:30:00Z"
+current_phase: 1
+last_updated: '2026-05-25T05:01:33Z'
 last_session_id: bootstrap-2026-05-23
 last_actor_role: doc-keeper
-
-# ----------------------------------------------------------------------------
-# BLUEPRINTS — version pinning (sha256 di-update saat blueprint berubah)
-# ----------------------------------------------------------------------------
 blueprints:
-  "00_EXECUTIVE_SUMMARY.md":               { sha256: "PENDING_INIT", read_at: null }
-  "01_CURRICULUM_ONTOLOGY_GRAPH.md":      { sha256: "PENDING_INIT", read_at: null }
-  "02_ADAPTIVE_ENGINE_SPEC.md":           { sha256: "PENDING_INIT", read_at: null }
-  "03_DATABASE_SCHEMA_MULTI_TENANTS.md":  { sha256: "PENDING_INIT", read_at: null }
-  "04_BACKEND_API_CONTRACTS.md":          { sha256: "PENDING_INIT", read_at: null }
-  "05_FRONTEND_DYNAMIC_UI_FLUTTER.md":    { sha256: "PENDING_INIT", read_at: null }
-  "06_TEACHER_DASHBOARD_ANALYTICS.md":    { sha256: "PENDING_INIT", read_at: null }
-  "07_SECURITY_PRIVACY_PASSPORT.md":      { sha256: "PENDING_INIT", read_at: null }
-  "08_DEVOPS_DEPLOYMENT_LOCAL_CLOUD.md":  { sha256: "PENDING_INIT", read_at: null }
-  "09_RAG_AND_TUTOR_SPEC.md":             { sha256: "PENDING_INIT", read_at: null }
-  "10_PARENT_APP_SPEC.md":                { sha256: "PENDING_INIT", read_at: null }
-  "11_ADMIN_YAYASAN_DASHBOARD.md":        { sha256: "PENDING_INIT", read_at: null }
-  "12_CROSS_JENJANG_TRANSITION.md":       { sha256: "PENDING_INIT", read_at: null }
-  "13_MIGRATIONS_AND_CICD.md":            { sha256: "PENDING_INIT", read_at: null }
-  "14_UI_UX_DESIGN_SYSTEM.md":            { sha256: "PENDING_INIT", read_at: null }
-  "15_PROJECT_STRUCTURE.md":              { sha256: "PENDING_INIT", read_at: null }
-  "16_AI_AGENT_IMPLEMENTATION_PLAYBOOK.md": { sha256: "PENDING_INIT", read_at: null }
-  "17_MASTER_PROMPT_AND_STATE.md":        { sha256: "PENDING_INIT", read_at: null }
-
-# ----------------------------------------------------------------------------
-# SENTINELS — sacred values (auto-derived, lihat 17 §2 T-05)
-# Apapun output yang menyebut nilai berbeda → HALT.
-# ----------------------------------------------------------------------------
+  00_EXECUTIVE_SUMMARY.md:
+    sha256: PENDING_INIT
+    read_at: null
+  01_CURRICULUM_ONTOLOGY_GRAPH.md:
+    sha256: PENDING_INIT
+    read_at: null
+  02_ADAPTIVE_ENGINE_SPEC.md:
+    sha256: PENDING_INIT
+    read_at: null
+  03_DATABASE_SCHEMA_MULTI_TENANTS.md:
+    sha256: PENDING_INIT
+    read_at: null
+  04_BACKEND_API_CONTRACTS.md:
+    sha256: PENDING_INIT
+    read_at: null
+  05_FRONTEND_DYNAMIC_UI_FLUTTER.md:
+    sha256: PENDING_INIT
+    read_at: null
+  06_TEACHER_DASHBOARD_ANALYTICS.md:
+    sha256: PENDING_INIT
+    read_at: null
+  07_SECURITY_PRIVACY_PASSPORT.md:
+    sha256: PENDING_INIT
+    read_at: null
+  08_DEVOPS_DEPLOYMENT_LOCAL_CLOUD.md:
+    sha256: PENDING_INIT
+    read_at: null
+  09_RAG_AND_TUTOR_SPEC.md:
+    sha256: PENDING_INIT
+    read_at: null
+  10_PARENT_APP_SPEC.md:
+    sha256: PENDING_INIT
+    read_at: null
+  11_ADMIN_YAYASAN_DASHBOARD.md:
+    sha256: PENDING_INIT
+    read_at: null
+  12_CROSS_JENJANG_TRANSITION.md:
+    sha256: PENDING_INIT
+    read_at: null
+  13_MIGRATIONS_AND_CICD.md:
+    sha256: PENDING_INIT
+    read_at: null
+  14_UI_UX_DESIGN_SYSTEM.md:
+    sha256: PENDING_INIT
+    read_at: null
+  15_PROJECT_STRUCTURE.md:
+    sha256: PENDING_INIT
+    read_at: null
+  16_AI_AGENT_IMPLEMENTATION_PLAYBOOK.md:
+    sha256: PENDING_INIT
+    read_at: null
+  17_MASTER_PROMPT_AND_STATE.md:
+    sha256: PENDING_INIT
+    read_at: null
 sentinels:
-  # BKT thresholds (Doc 02 §2)
-  "0.85": "Doc 02 §2 — BKT mastery threshold (P(L) ≥ 0.85)"
-  "0.20": "Doc 02 §2 — BKT remedial threshold (P(L) < 0.20)"
-  "0.15": "Doc 02 §4 — BKT p_init default (cold start)"
-  "0.30": "Doc 02 §6.B — p_guess max constraint"
-  "0.10": "Doc 02 §6.B — p_slip max constraint"
-  # JWT & Auth (Doc 07)
-  "RS256": "Doc 07 §B — required JWT algorithm (RS256 or ES256 only)"
-  "ES256": "Doc 07 §B — alternate JWT algorithm"
-  "HS256_FORBIDDEN": "Doc 07 §B — HS256 explicitly forbidden in production"
-  "15 menit": "Doc 07 §B — access token TTL"
-  "30 hari": "Doc 07 §B — refresh token TTL with rotation"
-  "10 menit": "Doc 07 §B — JWKS cache TTL"
-  # Retention (Doc 07 §E)
-  "90 hari": "Doc 07 §E — tutor_messages retention before hard delete"
-  "3 tahun": "Doc 07 §E — student_quiz_logs rolling retention"
-  "7 tahun": "Doc 07 §E — audit_events retention before offline archive"
-  "2 tahun": "Doc 07 §E — passport anonymization after student graduation"
-  # Authorization (Doc 07 §C)
-  "SISWA": "Doc 07 §C — student role"
-  "GURU": "Doc 07 §C — teacher role"
-  "ORANG_TUA": "Doc 07 §C — parent role"
-  "ADMIN_YAYASAN": "Doc 07 §C — yayasan admin role"
-  "SUPERADMIN": "Doc 07 §C — superadmin role (MFA mandatory)"
-  # UX / Accessibility (Doc 14)
-  "48dp": "Doc 14 §9 — minimum tap target standard"
-  "64dp": "Doc 14 §8.B — minimum tap target in KIDS_GAMIFIED mode"
-  "WCAG 2.2 AA": "Doc 14 §9 — accessibility standard"
-  # Performance (Doc 09 §8)
-  "3.5 detik": "Doc 09 §8 — P95 latency target for RAG/tutor end-to-end"
-  "800 ms": "Doc 09 §4.F — streaming start latency target"
-  # Transition (Doc 12)
-  "7 hari": "Doc 12 §2 — transition rollback window"
-  # Service names (Doc 08)
-  "aleta_postgres": "Doc 08 §3 — Postgres container name"
-  "aleta_neo4j": "Doc 08 §3 — Neo4j container name"
-  "aleta_redis": "Doc 08 §3 — Redis container name"
-  "aleta_ollama": "Doc 08 §3 — Ollama LLM container name"
-  "aleta_keycloak": "Doc 08 §3 — Keycloak IdP container name"
-  "aleta_core_api": "Doc 08 §3 — main FastAPI container"
-  "aleta_ai_engine": "Doc 08 §3 — internal AI service container"
-  "aleta_vector_db": "Doc 08 §3 — Qdrant container name"
-
-# ----------------------------------------------------------------------------
-# TASKS — ledger lengkap, di-derive dari Doc 16 §8
-# Status legal: pending | in_progress | done | blocked | deferred
-# ----------------------------------------------------------------------------
+  '0.85': "Doc 02 \xA72 \u2014 BKT mastery threshold (P(L) \u2265 0.85)"
+  '0.20': "Doc 02 \xA72 \u2014 BKT remedial threshold (P(L) < 0.20)"
+  '0.15': "Doc 02 \xA74 \u2014 BKT p_init default (cold start)"
+  '0.30': "Doc 02 \xA76.B \u2014 p_guess max constraint"
+  '0.10': "Doc 02 \xA76.B \u2014 p_slip max constraint"
+  RS256: "Doc 07 \xA7B \u2014 required JWT algorithm (RS256 or ES256 only)"
+  ES256: "Doc 07 \xA7B \u2014 alternate JWT algorithm"
+  HS256_FORBIDDEN: "Doc 07 \xA7B \u2014 HS256 explicitly forbidden in production"
+  15 menit: "Doc 07 \xA7B \u2014 access token TTL"
+  30 hari: "Doc 07 \xA7B \u2014 refresh token TTL with rotation"
+  10 menit: "Doc 07 \xA7B \u2014 JWKS cache TTL"
+  90 hari: "Doc 07 \xA7E \u2014 tutor_messages retention before hard delete"
+  3 tahun: "Doc 07 \xA7E \u2014 student_quiz_logs rolling retention"
+  7 tahun: "Doc 07 \xA7E \u2014 audit_events retention before offline archive"
+  2 tahun: "Doc 07 \xA7E \u2014 passport anonymization after student graduation"
+  SISWA: "Doc 07 \xA7C \u2014 student role"
+  GURU: "Doc 07 \xA7C \u2014 teacher role"
+  ORANG_TUA: "Doc 07 \xA7C \u2014 parent role"
+  ADMIN_YAYASAN: "Doc 07 \xA7C \u2014 yayasan admin role"
+  SUPERADMIN: "Doc 07 \xA7C \u2014 superadmin role (MFA mandatory)"
+  48dp: "Doc 14 \xA79 \u2014 minimum tap target standard"
+  64dp: "Doc 14 \xA78.B \u2014 minimum tap target in KIDS_GAMIFIED mode"
+  WCAG 2.2 AA: "Doc 14 \xA79 \u2014 accessibility standard"
+  3.5 detik: "Doc 09 \xA78 \u2014 P95 latency target for RAG/tutor end-to-end"
+  800 ms: "Doc 09 \xA74.F \u2014 streaming start latency target"
+  7 hari: "Doc 12 \xA72 \u2014 transition rollback window"
+  aleta_postgres: "Doc 08 \xA73 \u2014 Postgres container name"
+  aleta_neo4j: "Doc 08 \xA73 \u2014 Neo4j container name"
+  aleta_redis: "Doc 08 \xA73 \u2014 Redis container name"
+  aleta_ollama: "Doc 08 \xA73 \u2014 Ollama LLM container name"
+  aleta_keycloak: "Doc 08 \xA73 \u2014 Keycloak IdP container name"
+  aleta_core_api: "Doc 08 \xA73 \u2014 main FastAPI container"
+  aleta_ai_engine: "Doc 08 \xA73 \u2014 internal AI service container"
+  aleta_vector_db: "Doc 08 \xA73 \u2014 Qdrant container name"
 tasks:
-  # ===== Phase 0 — Bootstrap =====
   T-001:
-    title: "Initialize monorepo skeleton"
+    title: Initialize monorepo skeleton
     phase: 0
     role: devops
-    status: pending
+    status: done
     assignee: null
     started_at: null
-    completed_at: null
+    completed_at: '2026-05-25T05:00:00Z'
     depends_on: []
     artifacts: []
     handoffs_received: []
     handoffs_emitted: []
   T-002:
-    title: "Setup docker-compose with 12 services + healthchecks"
+    title: Setup docker-compose with 12 services + healthchecks
     phase: 0
     role: devops
-    status: pending
-    depends_on: [T-001]
+    status: done
+    depends_on:
+    - T-001
     artifacts: []
     handoffs_received: []
     handoffs_emitted: []
+    completed_at: '2026-05-25T05:00:00Z'
   T-003:
-    title: "Generate .env.example dan rotasi script"
+    title: Generate .env.example dan rotasi script
     phase: 0
     role: devops
-    status: pending
-    depends_on: [T-001]
+    status: done
+    depends_on:
+    - T-001
     artifacts: []
     handoffs_received: []
     handoffs_emitted: []
+    completed_at: '2026-05-25T05:00:00Z'
   T-004:
-    title: "Setup Keycloak realm export + auto-import"
+    title: Setup Keycloak realm export + auto-import
     phase: 0
     role: devops
-    status: pending
-    depends_on: [T-002]
+    status: done
+    depends_on:
+    - T-002
     artifacts: []
     handoffs_received: []
     handoffs_emitted: []
+    completed_at: '2026-05-25T05:00:00Z'
   T-005:
-    title: "Bootstrap CI workflow stub"
+    title: Bootstrap CI workflow stub
     phase: 0
     role: devops
-    status: pending
-    depends_on: [T-001]
+    status: done
+    depends_on:
+    - T-001
     artifacts: []
     handoffs_received: []
     handoffs_emitted: []
-
-  # ===== Phase 1 — Foundation =====
-  T-101: { title: "Alembic migrations untuk aleta_core (8 tabel utama)", phase: 1, role: dba, status: pending, depends_on: [T-002, T-004], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-102: { title: "Tenant template SQL untuk unit_smp", phase: 1, role: dba, status: pending, depends_on: [T-101], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-103: { title: "Neo4j bootstrap constraints + seed", phase: 1, role: dba, status: pending, depends_on: [T-002], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-104: { title: "Pydantic settings + logging setup", phase: 1, role: backend-coder, status: pending, depends_on: [T-002], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-105: { title: "SQLAlchemy models lengkap", phase: 1, role: backend-coder, status: pending, depends_on: [T-101, T-102, T-104], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-106: { title: "FastAPI app skeleton + health endpoint", phase: 1, role: backend-coder, status: pending, depends_on: [T-104], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-107: { title: "SecurityGuard + JWKS cache + RLS helpers", phase: 1, role: backend-coder, status: pending, depends_on: [T-105, T-106, T-004], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-108: { title: "Auth endpoints (login/refresh/logout)", phase: 1, role: backend-coder, status: pending, depends_on: [T-107], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-109: { title: "OpenAPI export + CI gate", phase: 1, role: devops, status: pending, depends_on: [T-108], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-
-  # ===== Phase 2 — Adaptive Core =====
-  T-201: { title: "ALETA_BKT_Engine + parameter provider", phase: 2, role: ai-engine-coder, status: pending, depends_on: [T-101, T-105], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-202: { title: "MatchmakerEngine + state machine", phase: 2, role: ai-engine-coder, status: pending, depends_on: [T-201, T-203], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-203: { title: "GraphClient (Neo4j adapter)", phase: 2, role: ai-engine-coder, status: pending, depends_on: [T-103], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-204: { title: "ai_engine FastAPI internal app", phase: 2, role: ai-engine-coder, status: pending, depends_on: [T-202], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-205: { title: "Session state repository", phase: 2, role: backend-coder, status: pending, depends_on: [T-105], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-206: { title: "ai_engine_client di backend_core", phase: 2, role: backend-coder, status: pending, depends_on: [T-204], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-207: { title: "Passport endpoint + read models", phase: 2, role: backend-coder, status: pending, depends_on: [T-107, T-205], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-208: { title: "/engine/evaluate endpoint (integrasi penuh)", phase: 2, role: backend-coder, status: pending, depends_on: [T-202, T-205, T-206, T-207], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-209: { title: "/auth integration tests (smoke)", phase: 2, role: qa, status: pending, depends_on: [T-108], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-210: { title: "/student/next-content endpoint", phase: 2, role: backend-coder, status: pending, depends_on: [T-205, T-208], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-211: { title: "BKT calibration job skeleton", phase: 2, role: ai-engine-coder, status: pending, depends_on: [T-201], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-212: { title: "Integration test - end-to-end adaptive loop", phase: 2, role: qa, status: pending, depends_on: [T-208, T-210], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-
-  # ===== Phase 3 — Student Mobile + Quiz Loop =====
-  T-301: { title: "Flutter skeleton + 2 flavor + main entry", phase: 3, role: flutter-coder, status: pending, depends_on: [T-001], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-302: { title: "Design tokens build (Style Dictionary)", phase: 3, role: web-coder, status: pending, depends_on: [T-001], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-303: { title: "Theme system + 3 mode rendering", phase: 3, role: flutter-coder, status: pending, depends_on: [T-302], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-304: { title: "AuthBloc + token store", phase: 3, role: flutter-coder, status: pending, depends_on: [T-301], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-305: { title: "API client Dio + interceptors", phase: 3, role: flutter-coder, status: pending, depends_on: [T-304], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-306: { title: "go_router config + route guards", phase: 3, role: flutter-coder, status: pending, depends_on: [T-304], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-307: { title: "OpenAPI Dart client generation", phase: 3, role: flutter-coder, status: pending, depends_on: [T-109, T-305], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-308: { title: "Home shell per mode (KIDS/JUNIOR/PRO)", phase: 3, role: flutter-coder, status: pending, depends_on: [T-303, T-306], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-309: { title: "Quiz player screen + state transitions", phase: 3, role: flutter-coder, status: pending, depends_on: [T-207, T-208, T-210, T-307, T-308], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-310: { title: "Shared widgets atoms/molecules", phase: 3, role: flutter-coder, status: pending, depends_on: [T-303], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-311: { title: "i18n setup + intl_id.arb", phase: 3, role: flutter-coder, status: pending, depends_on: [T-301], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-312: { title: "Widget tests untuk core flows", phase: 3, role: qa, status: pending, depends_on: [T-308, T-309], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-313: { title: "Integration test - golden path SMP", phase: 3, role: qa, status: pending, depends_on: [T-309, T-212], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-
-  # ===== Phase 4-8 (compact) — detail full di Doc 16 §8 =====
-  T-401: { title: "Teacher dashboard React scaffold", phase: 4, role: web-coder, status: pending, depends_on: [T-302], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-402: { title: "Tailwind config konsumsi @aleta/tokens", phase: 4, role: web-coder, status: pending, depends_on: [T-302, T-401], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-403: { title: "Auth flow web (login+refresh)", phase: 4, role: web-coder, status: pending, depends_on: [T-108, T-401], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-404: { title: "TanStack Query + API client typed", phase: 4, role: web-coder, status: pending, depends_on: [T-109, T-401], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-405: { title: "RedFlagDetector backend service", phase: 4, role: backend-coder, status: pending, depends_on: [T-208], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-406: { title: "/teacher/dashboard/summary endpoint", phase: 4, role: backend-coder, status: pending, depends_on: [T-405], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-407: { title: "/teacher/morning-briefing endpoint", phase: 4, role: backend-coder, status: pending, depends_on: [T-405, T-406], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-408: { title: "DifferentiationGroupCard component", phase: 4, role: web-coder, status: pending, depends_on: [T-404, T-406], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-409: { title: "MorningBriefing page", phase: 4, role: web-coder, status: pending, depends_on: [T-407, T-408], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-410: { title: "/teacher/modul-ajar generator + page", phase: 4, role: backend-coder, status: pending, depends_on: [T-404, T-407], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-411: { title: "axe-core a11y tests (3 surface)", phase: 4, role: qa, status: pending, depends_on: [T-409], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-
-  T-501: { title: "Qdrant collection init script", phase: 5, role: devops, status: pending, depends_on: [T-002], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-502: { title: "Ollama model pull script", phase: 5, role: devops, status: pending, depends_on: [T-002], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-503: { title: "Chunker (paragraph-aware)", phase: 5, role: ai-engine-coder, status: pending, depends_on: [T-204], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-504: { title: "Embedder + Retriever", phase: 5, role: ai-engine-coder, status: pending, depends_on: [T-501, T-502, T-503], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-505: { title: "RAG ingest job + admin endpoint", phase: 5, role: ai-engine-coder, status: pending, depends_on: [T-504], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-506: { title: "Rewriter + Validator (essence-preserving)", phase: 5, role: ai-engine-coder, status: pending, depends_on: [T-504, T-505], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-507: { title: "Tutor system prompt + 3-layer safety", phase: 5, role: ai-engine-coder, status: pending, depends_on: [T-502], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-508: { title: "/tutor/chat SSE endpoint", phase: 5, role: backend-coder, status: pending, depends_on: [T-507], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-509: { title: "TutorChatScreen (Flutter)", phase: 5, role: flutter-coder, status: pending, depends_on: [T-309, T-508], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-510: { title: "Tutor handoff notifications", phase: 5, role: backend-coder, status: pending, depends_on: [T-508], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-511: { title: "Prompt injection test corpus (30+ scenarios)", phase: 5, role: security-reviewer, status: pending, depends_on: [T-507], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-
-  T-601: { title: "Parent build flavor wiring", phase: 6, role: flutter-coder, status: pending, depends_on: [T-301], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-602: { title: "ParentHomeShell + HeadlineInsightCard", phase: 6, role: flutter-coder, status: pending, depends_on: [T-310, T-601], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-603: { title: "/parent/child-report endpoint", phase: 6, role: backend-coder, status: pending, depends_on: [T-207], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-604: { title: "/parent/home-activities endpoint", phase: 6, role: backend-coder, status: pending, depends_on: [T-506, T-603], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-605: { title: "Headline insight LLM prompt + safety", phase: 6, role: ai-engine-coder, status: pending, depends_on: [T-506], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-606: { title: "ConsentInbox screen (Flutter parent)", phase: 6, role: flutter-coder, status: pending, depends_on: [T-602], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-607: { title: "Admin dashboard scaffold", phase: 6, role: web-coder, status: pending, depends_on: [T-302], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-608: { title: "ATP Builder (react-flow)", phase: 6, role: web-coder, status: pending, depends_on: [T-607], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-609: { title: "System config UI + endpoint", phase: 6, role: web-coder, status: pending, depends_on: [T-607], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-610: { title: "Audit log explorer", phase: 6, role: web-coder, status: pending, depends_on: [T-607], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-611: { title: "Ops health panel", phase: 6, role: web-coder, status: pending, depends_on: [T-607], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-
-  T-701: { title: "Transition validator (5 rules)", phase: 7, role: backend-coder, status: pending, depends_on: [T-207], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-702: { title: "Transition orchestrator job", phase: 7, role: backend-coder, status: pending, depends_on: [T-701], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-703: { title: "Snapshot generator", phase: 7, role: backend-coder, status: pending, depends_on: [T-702], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-704: { title: "Passport letter PDF generator", phase: 7, role: backend-coder, status: pending, depends_on: [T-703], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-705: { title: "/admin/transition + /bulk endpoints", phase: 7, role: backend-coder, status: pending, depends_on: [T-702], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-706: { title: "Rollback flow (7-day window)", phase: 7, role: backend-coder, status: pending, depends_on: [T-705], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-707: { title: "v_passport_summary_for_teacher view", phase: 7, role: dba, status: pending, depends_on: [T-101], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-708: { title: "Transitions UI (admin dashboard)", phase: 7, role: web-coder, status: pending, depends_on: [T-607, T-705], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-709: { title: "E2E test TK→SD→SMP→SMA", phase: 7, role: qa, status: pending, depends_on: [T-706, T-708], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-
-  T-801: { title: "Security scan suite (Bandit/pip-audit/trivy/gitleaks)", phase: 8, role: security-reviewer, status: pending, depends_on: [T-005], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-802: { title: "Load test /engine/evaluate (1000 RPS target)", phase: 8, role: qa, status: pending, depends_on: [T-208], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-803: { title: "Backup + restore drill", phase: 8, role: devops, status: pending, depends_on: [T-002], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-804: { title: "Threat modeling workshop output", phase: 8, role: architect, status: pending, depends_on: [], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-805: { title: "MFA enforcement verify", phase: 8, role: security-reviewer, status: pending, depends_on: [T-108], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-806: { title: "Retention cron jobs activate", phase: 8, role: backend-coder, status: pending, depends_on: [T-101], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-807: { title: "Audit completeness verify", phase: 8, role: qa, status: pending, depends_on: [T-208, T-705], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-808: { title: "Performance tuning Neo4j+Qdrant", phase: 8, role: devops, status: pending, depends_on: [T-504], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-809: { title: "Handbook + onboarding docs", phase: 8, role: doc-keeper, status: pending, depends_on: [], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-  T-810: { title: "Pilot release tag v0.1.0-pilot", phase: 8, role: architect, status: pending, depends_on: [T-801, T-802, T-803, T-805, T-807, T-809], artifacts: [], handoffs_received: [], handoffs_emitted: [] }
-
-# ----------------------------------------------------------------------------
-# FILES — ledger semua file yang sudah ditulis agent
-# ----------------------------------------------------------------------------
+    completed_at: '2026-05-25T05:00:00Z'
+  T-101:
+    title: Alembic migrations untuk aleta_core (8 tabel utama)
+    phase: 1
+    role: dba
+    status: pending
+    depends_on:
+    - T-002
+    - T-004
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-102:
+    title: Tenant template SQL untuk unit_smp
+    phase: 1
+    role: dba
+    status: pending
+    depends_on:
+    - T-101
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-103:
+    title: Neo4j bootstrap constraints + seed
+    phase: 1
+    role: dba
+    status: pending
+    depends_on:
+    - T-002
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-104:
+    title: Pydantic settings + logging setup
+    phase: 1
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-002
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-105:
+    title: SQLAlchemy models lengkap
+    phase: 1
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-101
+    - T-102
+    - T-104
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-106:
+    title: FastAPI app skeleton + health endpoint
+    phase: 1
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-104
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-107:
+    title: SecurityGuard + JWKS cache + RLS helpers
+    phase: 1
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-105
+    - T-106
+    - T-004
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-108:
+    title: Auth endpoints (login/refresh/logout)
+    phase: 1
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-107
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-109:
+    title: OpenAPI export + CI gate
+    phase: 1
+    role: devops
+    status: pending
+    depends_on:
+    - T-108
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-201:
+    title: ALETA_BKT_Engine + parameter provider
+    phase: 2
+    role: ai-engine-coder
+    status: pending
+    depends_on:
+    - T-101
+    - T-105
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-202:
+    title: MatchmakerEngine + state machine
+    phase: 2
+    role: ai-engine-coder
+    status: pending
+    depends_on:
+    - T-201
+    - T-203
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-203:
+    title: GraphClient (Neo4j adapter)
+    phase: 2
+    role: ai-engine-coder
+    status: pending
+    depends_on:
+    - T-103
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-204:
+    title: ai_engine FastAPI internal app
+    phase: 2
+    role: ai-engine-coder
+    status: pending
+    depends_on:
+    - T-202
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-205:
+    title: Session state repository
+    phase: 2
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-105
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-206:
+    title: ai_engine_client di backend_core
+    phase: 2
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-204
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-207:
+    title: Passport endpoint + read models
+    phase: 2
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-107
+    - T-205
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-208:
+    title: /engine/evaluate endpoint (integrasi penuh)
+    phase: 2
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-202
+    - T-205
+    - T-206
+    - T-207
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-209:
+    title: /auth integration tests (smoke)
+    phase: 2
+    role: qa
+    status: pending
+    depends_on:
+    - T-108
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-210:
+    title: /student/next-content endpoint
+    phase: 2
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-205
+    - T-208
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-211:
+    title: BKT calibration job skeleton
+    phase: 2
+    role: ai-engine-coder
+    status: pending
+    depends_on:
+    - T-201
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-212:
+    title: Integration test - end-to-end adaptive loop
+    phase: 2
+    role: qa
+    status: pending
+    depends_on:
+    - T-208
+    - T-210
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-301:
+    title: Flutter skeleton + 2 flavor + main entry
+    phase: 3
+    role: flutter-coder
+    status: pending
+    depends_on:
+    - T-001
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-302:
+    title: Design tokens build (Style Dictionary)
+    phase: 3
+    role: web-coder
+    status: pending
+    depends_on:
+    - T-001
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-303:
+    title: Theme system + 3 mode rendering
+    phase: 3
+    role: flutter-coder
+    status: pending
+    depends_on:
+    - T-302
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-304:
+    title: AuthBloc + token store
+    phase: 3
+    role: flutter-coder
+    status: pending
+    depends_on:
+    - T-301
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-305:
+    title: API client Dio + interceptors
+    phase: 3
+    role: flutter-coder
+    status: pending
+    depends_on:
+    - T-304
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-306:
+    title: go_router config + route guards
+    phase: 3
+    role: flutter-coder
+    status: pending
+    depends_on:
+    - T-304
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-307:
+    title: OpenAPI Dart client generation
+    phase: 3
+    role: flutter-coder
+    status: pending
+    depends_on:
+    - T-109
+    - T-305
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-308:
+    title: Home shell per mode (KIDS/JUNIOR/PRO)
+    phase: 3
+    role: flutter-coder
+    status: pending
+    depends_on:
+    - T-303
+    - T-306
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-309:
+    title: Quiz player screen + state transitions
+    phase: 3
+    role: flutter-coder
+    status: pending
+    depends_on:
+    - T-207
+    - T-208
+    - T-210
+    - T-307
+    - T-308
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-310:
+    title: Shared widgets atoms/molecules
+    phase: 3
+    role: flutter-coder
+    status: pending
+    depends_on:
+    - T-303
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-311:
+    title: i18n setup + intl_id.arb
+    phase: 3
+    role: flutter-coder
+    status: pending
+    depends_on:
+    - T-301
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-312:
+    title: Widget tests untuk core flows
+    phase: 3
+    role: qa
+    status: pending
+    depends_on:
+    - T-308
+    - T-309
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-313:
+    title: Integration test - golden path SMP
+    phase: 3
+    role: qa
+    status: pending
+    depends_on:
+    - T-309
+    - T-212
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-401:
+    title: Teacher dashboard React scaffold
+    phase: 4
+    role: web-coder
+    status: pending
+    depends_on:
+    - T-302
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-402:
+    title: Tailwind config konsumsi @aleta/tokens
+    phase: 4
+    role: web-coder
+    status: pending
+    depends_on:
+    - T-302
+    - T-401
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-403:
+    title: Auth flow web (login+refresh)
+    phase: 4
+    role: web-coder
+    status: pending
+    depends_on:
+    - T-108
+    - T-401
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-404:
+    title: TanStack Query + API client typed
+    phase: 4
+    role: web-coder
+    status: pending
+    depends_on:
+    - T-109
+    - T-401
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-405:
+    title: RedFlagDetector backend service
+    phase: 4
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-208
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-406:
+    title: /teacher/dashboard/summary endpoint
+    phase: 4
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-405
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-407:
+    title: /teacher/morning-briefing endpoint
+    phase: 4
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-405
+    - T-406
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-408:
+    title: DifferentiationGroupCard component
+    phase: 4
+    role: web-coder
+    status: pending
+    depends_on:
+    - T-404
+    - T-406
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-409:
+    title: MorningBriefing page
+    phase: 4
+    role: web-coder
+    status: pending
+    depends_on:
+    - T-407
+    - T-408
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-410:
+    title: /teacher/modul-ajar generator + page
+    phase: 4
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-404
+    - T-407
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-411:
+    title: axe-core a11y tests (3 surface)
+    phase: 4
+    role: qa
+    status: pending
+    depends_on:
+    - T-409
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-501:
+    title: Qdrant collection init script
+    phase: 5
+    role: devops
+    status: pending
+    depends_on:
+    - T-002
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-502:
+    title: Ollama model pull script
+    phase: 5
+    role: devops
+    status: pending
+    depends_on:
+    - T-002
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-503:
+    title: Chunker (paragraph-aware)
+    phase: 5
+    role: ai-engine-coder
+    status: pending
+    depends_on:
+    - T-204
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-504:
+    title: Embedder + Retriever
+    phase: 5
+    role: ai-engine-coder
+    status: pending
+    depends_on:
+    - T-501
+    - T-502
+    - T-503
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-505:
+    title: RAG ingest job + admin endpoint
+    phase: 5
+    role: ai-engine-coder
+    status: pending
+    depends_on:
+    - T-504
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-506:
+    title: Rewriter + Validator (essence-preserving)
+    phase: 5
+    role: ai-engine-coder
+    status: pending
+    depends_on:
+    - T-504
+    - T-505
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-507:
+    title: Tutor system prompt + 3-layer safety
+    phase: 5
+    role: ai-engine-coder
+    status: pending
+    depends_on:
+    - T-502
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-508:
+    title: /tutor/chat SSE endpoint
+    phase: 5
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-507
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-509:
+    title: TutorChatScreen (Flutter)
+    phase: 5
+    role: flutter-coder
+    status: pending
+    depends_on:
+    - T-309
+    - T-508
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-510:
+    title: Tutor handoff notifications
+    phase: 5
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-508
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-511:
+    title: Prompt injection test corpus (30+ scenarios)
+    phase: 5
+    role: security-reviewer
+    status: pending
+    depends_on:
+    - T-507
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-601:
+    title: Parent build flavor wiring
+    phase: 6
+    role: flutter-coder
+    status: pending
+    depends_on:
+    - T-301
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-602:
+    title: ParentHomeShell + HeadlineInsightCard
+    phase: 6
+    role: flutter-coder
+    status: pending
+    depends_on:
+    - T-310
+    - T-601
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-603:
+    title: /parent/child-report endpoint
+    phase: 6
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-207
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-604:
+    title: /parent/home-activities endpoint
+    phase: 6
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-506
+    - T-603
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-605:
+    title: Headline insight LLM prompt + safety
+    phase: 6
+    role: ai-engine-coder
+    status: pending
+    depends_on:
+    - T-506
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-606:
+    title: ConsentInbox screen (Flutter parent)
+    phase: 6
+    role: flutter-coder
+    status: pending
+    depends_on:
+    - T-602
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-607:
+    title: Admin dashboard scaffold
+    phase: 6
+    role: web-coder
+    status: pending
+    depends_on:
+    - T-302
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-608:
+    title: ATP Builder (react-flow)
+    phase: 6
+    role: web-coder
+    status: pending
+    depends_on:
+    - T-607
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-609:
+    title: System config UI + endpoint
+    phase: 6
+    role: web-coder
+    status: pending
+    depends_on:
+    - T-607
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-610:
+    title: Audit log explorer
+    phase: 6
+    role: web-coder
+    status: pending
+    depends_on:
+    - T-607
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-611:
+    title: Ops health panel
+    phase: 6
+    role: web-coder
+    status: pending
+    depends_on:
+    - T-607
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-701:
+    title: Transition validator (5 rules)
+    phase: 7
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-207
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-702:
+    title: Transition orchestrator job
+    phase: 7
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-701
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-703:
+    title: Snapshot generator
+    phase: 7
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-702
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-704:
+    title: Passport letter PDF generator
+    phase: 7
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-703
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-705:
+    title: /admin/transition + /bulk endpoints
+    phase: 7
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-702
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-706:
+    title: Rollback flow (7-day window)
+    phase: 7
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-705
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-707:
+    title: v_passport_summary_for_teacher view
+    phase: 7
+    role: dba
+    status: pending
+    depends_on:
+    - T-101
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-708:
+    title: Transitions UI (admin dashboard)
+    phase: 7
+    role: web-coder
+    status: pending
+    depends_on:
+    - T-607
+    - T-705
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-709:
+    title: "E2E test TK\u2192SD\u2192SMP\u2192SMA"
+    phase: 7
+    role: qa
+    status: pending
+    depends_on:
+    - T-706
+    - T-708
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-801:
+    title: Security scan suite (Bandit/pip-audit/trivy/gitleaks)
+    phase: 8
+    role: security-reviewer
+    status: pending
+    depends_on:
+    - T-005
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-802:
+    title: Load test /engine/evaluate (1000 RPS target)
+    phase: 8
+    role: qa
+    status: pending
+    depends_on:
+    - T-208
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-803:
+    title: Backup + restore drill
+    phase: 8
+    role: devops
+    status: pending
+    depends_on:
+    - T-002
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-804:
+    title: Threat modeling workshop output
+    phase: 8
+    role: architect
+    status: pending
+    depends_on: []
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-805:
+    title: MFA enforcement verify
+    phase: 8
+    role: security-reviewer
+    status: pending
+    depends_on:
+    - T-108
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-806:
+    title: Retention cron jobs activate
+    phase: 8
+    role: backend-coder
+    status: pending
+    depends_on:
+    - T-101
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-807:
+    title: Audit completeness verify
+    phase: 8
+    role: qa
+    status: pending
+    depends_on:
+    - T-208
+    - T-705
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-808:
+    title: Performance tuning Neo4j+Qdrant
+    phase: 8
+    role: devops
+    status: pending
+    depends_on:
+    - T-504
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-809:
+    title: Handbook + onboarding docs
+    phase: 8
+    role: doc-keeper
+    status: pending
+    depends_on: []
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
+  T-810:
+    title: Pilot release tag v0.1.0-pilot
+    phase: 8
+    role: architect
+    status: pending
+    depends_on:
+    - T-801
+    - T-802
+    - T-803
+    - T-805
+    - T-807
+    - T-809
+    artifacts: []
+    handoffs_received: []
+    handoffs_emitted: []
 files: {}
-
-# ----------------------------------------------------------------------------
-# PENDING HANDOFFS — handoff yang menunggu agent berikutnya
-# ----------------------------------------------------------------------------
 pending_handoffs: []
-
-# ----------------------------------------------------------------------------
-# OPEN ISSUES — hambatan/drift yang belum di-resolve
-# ----------------------------------------------------------------------------
 open_issues: []
-
-# ----------------------------------------------------------------------------
-# SYNC POINTS — milestone phase yang sudah lulus review architect
-# ----------------------------------------------------------------------------
 sync_points_passed: []
-
-# ----------------------------------------------------------------------------
-# METRICS — kumulatif untuk dashboard progress
-# ----------------------------------------------------------------------------
 metrics:
-  tasks_completed: 0
+  tasks_completed: 5
   files_written: 0
   tokens_consumed_estimated: 0
   sync_points_passed: 0

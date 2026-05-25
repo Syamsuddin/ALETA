@@ -1,0 +1,57 @@
+# docker-compose.override.yml.example
+#
+# Cara pakai:
+# 1. Salin berkas ini menjadi 'docker-compose.override.yml'
+# 2. Sesuaikan konfigurasi sesuai perangkat pengembangan lokal Anda (misal mengaktifkan GPU)
+# 3. Jalankan 'make dev'
+
+version: '3.8'
+
+services:
+  # Ekspos port PostgreSQL untuk kemudahan koneksi klien DB lokal (DBeaver/datagrip)
+  aleta_postgres:
+    ports:
+      - "5432:5432"
+
+  # Ekspos port Neo4j untuk mengakses konsol visual Neo4j Browser lokal di http://localhost:7474
+  aleta_neo4j:
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+
+  # Ekspos port Redis untuk memantau data sesi lokal
+  aleta_redis:
+    ports:
+      - "6379:6379"
+
+  # Konfigurasi GPU untuk Ollama jika Anda menggunakan Linux/Windows dengan kartu grafis NVIDIA
+  aleta_ollama:
+    ports:
+      - "11434:11434"
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  # Ekspos port Qdrant untuk melihat dasbor web visual Qdrant lokal di http://localhost:6333/dashboard
+  aleta_vector_db:
+    ports:
+      - "6333:6333"
+
+  # Ekspos port backend API untuk pengujian manual lokal tanpa melalui Nginx gateway
+  aleta_core_api:
+    ports:
+      - "8000:8000"
+
+  # Ekspos port Keycloak untuk pengelolaan konsol admin lokal langsung di http://localhost:8080
+  aleta_keycloak:
+    ports:
+      - "8080:8080"
+
+  # Ekspos port AI Engine untuk pengujian internal lokal
+  aleta_ai_engine:
+    ports:
+      - "8001:8000"
